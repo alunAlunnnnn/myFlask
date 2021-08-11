@@ -42,6 +42,7 @@ def para_test():
     return str(args)
 
 
+# ****** 返回 Response 对象 ******
 @blue.route('/response-test', methods=['get', 'post'])
 def response_test():
     res = make_response('返回个 Response')
@@ -62,6 +63,7 @@ def response_test2():
     return res
 
 
+# ****** 重定向 ******
 @blue.route('/redirect-test', methods=['get', 'post'])
 def redirect_test():
     a = redirect(url_for('blue.response_test2'))
@@ -71,6 +73,7 @@ def redirect_test():
     return redirect(url_for('blue.message'))
 
 
+# ****** 登录跳转 ******
 @blue.route('/welcome', methods=['get', 'post'])
 def welcome():
     name = request.form.get('name')
@@ -84,6 +87,7 @@ def login():
     return render_template('login.html')
 
 
+# ****** 异常捕获 ******
 @blue.route('/error-test-404')
 def error_test_404():
     abort(404)
@@ -94,3 +98,17 @@ def error_test_404():
 @blue.errorhandler(404)
 def handler_404(exception):
     return '现在是404状态，但是被捕获到了'
+
+
+# ****** cookie登录 ******
+@blue.route('/cookie-login', methods=['get', 'post'])
+def cookie_login():
+    return render_template('cookie_login.html')
+
+
+@blue.route('/cookie-test', methods=['get', 'post'])
+def cookie_test():
+    name = request.form.get('name')
+    age = request.form.get('age')
+
+    return render_template('welcome.html', name=name, age=age)
