@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+</head>
+<body>
+    {# form表单的 action 属性代表表单提交时请求的路由， method 默认为 get #}
+    <form action="{{ url_for('blue.welcome') }}" method="post">
+        {# 两个输入框，name属性为请求体中传参的参数名，输入框中的值为参数值 #}
+        姓名：<input type="text" name="name">
+        年龄：<input type="text" name="age">
+        {# 提交可以使用 <button> 或 <input type="submit"> #}
+        <button>提交</button>
+    </form>
+</body>
+</html>
