@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint, request, make_response, Response, redirect, url_for, abort
+from flask import render_template, Blueprint, request, make_response, Response, redirect, url_for, abort, session
 
 blue = Blueprint('blue', __name__)
 
@@ -24,8 +24,12 @@ def message():
 
 
 @blue.route('/surface', methods=['get', 'post'])
-def surface():
-    return render_template('surface_wave.html')
+def surface(): 
+    # username = request.form.get('name')
+
+    username = session.get('username')
+    print(username)
+    return render_template('surface_wave.html', name=username)
 
 
 @blue.route('/para-test', methods=['get', 'post'])
@@ -84,7 +88,8 @@ def welcome():
 
 @blue.route('/login', methods=['get', 'post'])
 def login():
-    return render_template('login.html')
+    username = session.get('username')
+    return render_template('login.html', name=username)
 
 
 # ****** 异常捕获 ******
@@ -101,14 +106,115 @@ def handler_404(exception):
 
 
 # ****** cookie登录 ******
+# 登录页面
 @blue.route('/cookie-login', methods=['get', 'post'])
 def cookie_login():
-    return render_template('cookie_login.html')
+    username = request.form.get('name')
+    return render_template('cookie_login.html', name=username)
 
 
+# 通过重定向来获取具有客户端请求参数的，response对象，并且将信息存入 cookie
+@blue.route('/cookie-redirect', methods=['get', 'post'])
+def cookie_redirect():
+    # get username fron clien
+    username = request.form.get('name')
+    password = request.form.get('password')
+
+    # redirect() return a response object
+    response = redirect(url_for('blue.cookie_test'))
+    response.set_cookie('username', username)
+    response.set_cookie('password', password)
+
+    return response
+
+
+# 重定向的目标网址，该网址从 cookie 中获取用户身份信息，并返回相应权限的数据
 @blue.route('/cookie-test', methods=['get', 'post'])
 def cookie_test():
-    name = request.form.get('name')
-    age = request.form.get('age')
+    # Registered user in database
+    users = {
+        'alun': {
+            'password': 'zuishuai',
+            'age': 18
+        }
+    }
 
-    return render_template('welcome.html', name=name, age=age)
+    username = request.cookies.get('username', '游客')
+    password = request.cookies.get('password')
+
+    user = users.get(username, '游客')
+    if user == '游客':
+        return render_template('welcome.html', name='游客', age='不管多少永远18')
+
+    passwd = user.get('password')
+
+    if password != passwd:
+        return '用户名或密码错误'
+
+    age = user.get('age')
+
+    return render_template('welcome.html', name=username, age=age)
+
+
+# 这里设置了一个主动调用时会清除掉 cookie 的页面
+@blue.route('/cookie-clear', methods=['get', 'post'])
+def cookie_clear():
+    response = redirect(url_for('blue.cookie_test'))
+    response.delete_cookie('username')
+    response.delete_cookie('password')
+
+    return response
+
+
+# ****** session登录 ******
+# session 登录页面
+@blue.route('/session-login', methods=['get', 'post'])
+def session_login():
+    return render_template('session_login.html')
+
+
+@blue.route('/session-redirect', methods=['get', 'post'])
+def session_redirect():
+    user_req = request.form.get('name')
+    passwd_req = request.form.get('password')
+    print("user_req: ", user_req)
+    print("passwd_req: ", passwd_req)
+
+    session['username'] = user_req
+    session['password'] = passwd_req
+
+    return redirect(url_for('blue.session_test'))
+
+
+@blue.route('/session-test', methods=['get', 'post'])
+def session_test():
+    users = {
+        'alun': {
+            'password': 'zuishuai',
+            'age': 18
+        }
+    }
+
+    username = session.get('username')
+    password = session.get('password')
+
+    user = users.get(username, '游客')
+    if user == '游客':
+        return render_template('welcome.html', name='游客', age='永远18')
+
+    passwd = user.get('password')
+
+    if password != passwd:
+        return '用户名或密码错误！'
+
+    age = user.get('age')
+
+    return render_template('welcome.html', name=username, age=age)
+
+
+@blue.route('/session-clear')
+def session_clear():
+    session.pop('username')
+    session.pop('password')
+
+    return redirect(url_for('blue.session_test'))
