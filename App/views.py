@@ -24,7 +24,7 @@ def message():
 
 
 @blue.route('/surface', methods=['get', 'post'])
-def surface(): 
+def surface():
     # username = request.form.get('name')
 
     username = session.get('username')
