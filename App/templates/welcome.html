@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎</title>
+</head>
+<body>
+
+<ol>
+    <li>名称：{{ name }}</li>
+    <li>年龄：{{ age }}</li>
+</ol>
+
+<div><button><a href="{{ url_for('blue.cookie_clear') }}">清除 cookie</a></button></div>
+<div><button><a href="{{ url_for('blue.session_clear') }}">清除 session</a></button></div>
+<div><button><a href="{{ url_for('blue.surface') }}">去 surface</a></button></div>
+
+<div>
+    <p4>当前登录用户为 {{ name }}</p4>
+</div>
+
+</body>
+</html>
